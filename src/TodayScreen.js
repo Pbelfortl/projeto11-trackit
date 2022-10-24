@@ -2,6 +2,7 @@ import { Container } from "./GlobalStyles"
 import TopBar from "./TopBar"
 import { useContext, useEffect, useState } from "react"
 import Context from "./Context"
+import userProgress from "./userProgress"
 import BottomBar from "./BottomBar"
 import styled from "styled-components"
 import axios from "axios"
@@ -19,35 +20,77 @@ export default function TodayScreen () {
     const [userInfo, setUserInfo] = useContext(Context)
     const [todayTasks, setTodayTasks] = useState([])
     const [date, setDate] = useState(`${weekDays[weekDay]}, ${day}/${month+1}`)
+    let doneTasks = 0
+    const [progress, setProgress] = useState()
+    let refresh = 0
+    const [refreshState, setRefreshState] = useState(refresh)
+    
 
     useEffect (()=> {
         axios.get(`${BASE_URL}/habits/today`,{ headers: { Authorization: `Bearer ${userInfo.token}`}})
-            .then(ans => setTodayTasks(ans.data))
+            .then(ans => isDone(ans.data))
             .catch(ans => alert(ans.response.data.message))
-    }, [])
+    }, [refreshState])
+
+    function isDone (ans) {
+        doneTasks = 0
+        setTodayTasks(ans)
+        ans.forEach(element => {
+            if(element.done===true){
+                doneTasks++
+            }
+        });
+        setProgress(doneTasks)
+    }
 
     return(
         <Container>
             <TopBar/>
             <TodayDate>
                     {date} <br/>
-                    <Progress>
-                        Progresso
+                    <Progress doneTasks={doneTasks}>
+                         {todayTasks.length===0? 'Nenhum hábito concluído ainda' : `${parseInt(progress*100/(todayTasks.length))}% dos hábitos concluídos`}
                     </Progress>
             </TodayDate>
             <TodayContainer>
                 {todayTasks.map((T) => 
-                    <Today key={T.id} name={T.name} current={T.currentSequence} highest={T.highestSequence} done={T.done}></Today>)}                
+                    <Today key={T.id} 
+                        id={T.id} 
+                        name={T.name} 
+                        current={T.currentSequence} 
+                        highest={T.highestSequence} 
+                        done={T.done}  
+                        userInfo={userInfo} 
+                        refresh={refresh}
+                        setRefreshState={setRefreshState}></Today>)}                
             </TodayContainer>
             <BottomBar/>
         </Container>
     )
 }
 
-function Today ({name, current, highest, done}) {
+function Today ({id, name, current, highest, done, refresh, userInfo, setRefreshState}) {
 
     const [doneState, setDoneState] = useState(done)
-    let switcher  = false
+
+    function doneTask (doneState) {
+
+        if(doneState === false){
+            axios.post(`${BASE_URL}/habits/${id}/check`,{}, {headers: { Authorization: `Bearer ${userInfo.token}`}})
+                .then(refreshPage(doneState))
+                .catch(ans => alert(ans.response.data.message))
+        }else{
+            axios.post(`${BASE_URL}/habits/${id}/uncheck`,{}, {headers: { Authorization: `Bearer ${userInfo.token}` }})
+                .then(refreshPage(doneState))
+                .catch(ans => alert(ans.response.data.message))
+        }
+    }
+
+    function refreshPage (ans) {
+        setDoneState(!ans)
+        refresh++
+        setRefreshState(refresh++)
+    }
     
     return(
         <Task doneState={doneState}>
@@ -56,7 +99,7 @@ function Today ({name, current, highest, done}) {
                 Sequência atual: {current}<br/>
                 Seu recorde: {highest}
             </Sequence>
-            <ion-icon src={checkBox} onClick={()=> setDoneState(!switcher)}/>
+            <ion-icon src={checkBox} onClick={()=> doneTask(doneState)}/>
         </Task>
     )
 
@@ -107,6 +150,7 @@ const TodayDate = styled.div`
 const Progress = styled.div`
     font-size: 18px;
     font-weight: 400;
+    color: ${props => props.doneTasks!==0 ? '#8FC549' : '#BABABA'};
 `
 
 const TodayContainer = styled.div`
