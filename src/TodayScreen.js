@@ -48,7 +48,7 @@ export default function TodayScreen () {
             <TopBar/>
             <TodayDate>
                     {date} <br/>
-                    <Progress doneTasks={doneTasks}>
+                    <Progress progress={progress}>
                          {todayTasks.length===0? 'Nenhum hábito concluído ainda' : `${parseInt(progress*100/(todayTasks.length))}% dos hábitos concluídos`}
                     </Progress>
             </TodayDate>
@@ -150,7 +150,7 @@ const TodayDate = styled.div`
 const Progress = styled.div`
     font-size: 18px;
     font-weight: 400;
-    color: ${props => props.doneTasks!==0 ? '#8FC549' : '#BABABA'};
+    color: ${props => props.progress!==0 ? '#8FC549' : '#BABABA'};
 `
 
 const TodayContainer = styled.div`
