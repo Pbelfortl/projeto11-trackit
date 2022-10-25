@@ -8,8 +8,8 @@ import axios from "axios"
 import BASE_URL from "./constants/urls"
 import { topcolor } from "./constants/colors"
 import checkBox from "./images/checkbox.svg"
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import userProgress from "./userProgress"
+
 
 export default function TodayScreen () {
 
@@ -35,6 +35,7 @@ export default function TodayScreen () {
 
     function isDone (ans) {
         doneTasks = 0
+        console.log(ans)
         setTodayTasks(ans)
         ans.forEach(element => {
             if(element.done===true){
@@ -42,6 +43,8 @@ export default function TodayScreen () {
             }
         });
         setProgress(doneTasks)
+        userProgress.done = doneTasks
+        userProgress.tasks = todayTasks.length
     }
 
     return(
@@ -73,7 +76,6 @@ export default function TodayScreen () {
 function Today ({id, name, current, highest, done, refresh, userInfo, setRefreshState}) {
 
     const [doneState, setDoneState] = useState(done)
-    refresh = 0
 
     function doneTask (doneState) {
 

@@ -3,16 +3,25 @@ import styled from "styled-components";
 import { softblue } from "./constants/colors";
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import userProgress from "./userProgress";
+import { useEffect, useState } from "react";
 
 
 export default function BottomBar() {
     const navigate = useNavigate()
+    const [progress, setProgress] = useState(userProgress)
+
+    function refreshBar() {
+        navigate('/hoje')
+        setProgress(userProgress)
+    }
+
     return (
         <BottomBox>
             <Link to='/habitos'>Hábitos</Link>
-            <button onClick={()=>navigate('/hoje')}>
-                <CircularProgressbar 
-                    value={'50'}
+            <button onClick={() => refreshBar()}>
+                <CircularProgressbar
+                    value={progress === 0 ? '0' : parseInt(progress.done * 100 / (progress.tasks))}
                     text={`Hoje`}
                     background
                     backgroundPadding={2}
@@ -21,13 +30,14 @@ export default function BottomBar() {
                         textColor: "white",
                         pathColor: "white",
                         trailColor: softblue,
-                        textSize:'25px'
+                        textSize: '25px'
                     })}
                 />
             </button>
             <Link to='/historico'>Histórico</Link>
         </BottomBox>
     )
+
 }
 
 
