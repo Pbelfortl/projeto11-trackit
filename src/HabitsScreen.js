@@ -27,12 +27,11 @@ export default function HabitsScreen() {
         axios.get(`${BASE_URL}/habits`, { headers: { Authorization: `Bearer ${userInfo.token}` } })
             .then(ans => refreshPage(ans.data.reverse()))
             .catch(ans => alert(ans.response.data.message))
-    }, [refresh])
+    }, [refresh, show])
 
     function refreshPage (ans) {
         setHabitsList([...ans])
         setInputStatus(false)
-        setShow(false)
         setRefresh(counter++)
     }
 
@@ -44,14 +43,14 @@ export default function HabitsScreen() {
         }
         setInputStatus(true)
         axios.post(`${BASE_URL}/habits`, { name: habit, days: habitsDays }, { headers: { Authorization: `Bearer ${userInfo.token}` } })
-            .then(setRefresh(counter++))
+            .then(()=>setShow(false))
             .catch(ans => alert(ans.response.data.message))
         habitsDays = []
         habit = undefined
     }
 
     function deleteHabit(id) {
-        
+
         if(window.confirm('Deseja excluir a tarefa?')){
             axios.delete(`${BASE_URL}/habits/${id}`, { headers: { Authorization: `Bearer ${userInfo.token}` } })
             .then(setRefresh(counter++))

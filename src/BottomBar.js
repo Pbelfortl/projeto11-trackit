@@ -1,17 +1,35 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { softblue } from "./constants/colors";
+import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
-export default function BottomBar () {
+
+export default function BottomBar() {
     const navigate = useNavigate()
     return (
         <BottomBox>
             <Link to='/habitos'>Hábitos</Link>
-            <button onClick={()=>navigate('/hoje')}>Hoje</button>
+            <button onClick={()=>navigate('/hoje')}>
+                <CircularProgressbar 
+                    value={'50'}
+                    text={`Hoje`}
+                    background
+                    backgroundPadding={2}
+                    styles={buildStyles({
+                        backgroundColor: softblue,
+                        textColor: "white",
+                        pathColor: "white",
+                        trailColor: softblue,
+                        textSize:'25px'
+                    })}
+                />
+            </button>
             <Link to='/historico'>Histórico</Link>
         </BottomBox>
     )
 }
+
 
 const BottomBox = styled.div`
     height: 70px;
@@ -24,7 +42,7 @@ const BottomBox = styled.div`
     justify-content: space-around;
     background-color: white;
     color: ${softblue};
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 400;
     button{
         width: 91px;
@@ -34,7 +52,6 @@ const BottomBox = styled.div`
         margin-bottom: 40px;
         border:none;
         color:white;
-        font-size: 18px;
         box-sizing: border-box;
         cursor: pointer;
     }

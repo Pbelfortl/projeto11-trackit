@@ -2,13 +2,14 @@ import { Container } from "./GlobalStyles"
 import TopBar from "./TopBar"
 import { useContext, useEffect, useState } from "react"
 import Context from "./Context"
-import userProgress from "./userProgress"
 import BottomBar from "./BottomBar"
 import styled from "styled-components"
 import axios from "axios"
 import BASE_URL from "./constants/urls"
 import { topcolor } from "./constants/colors"
 import checkBox from "./images/checkbox.svg"
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 export default function TodayScreen () {
 
@@ -21,7 +22,7 @@ export default function TodayScreen () {
     const [todayTasks, setTodayTasks] = useState([])
     const [date, setDate] = useState(`${weekDays[weekDay]}, ${day}/${month+1}`)
     let doneTasks = 0
-    const [progress, setProgress] = useState()
+    const [progress, setProgress] = useState(doneTasks)
     let refresh = 0
     const [refreshState, setRefreshState] = useState(refresh)
     
@@ -30,7 +31,7 @@ export default function TodayScreen () {
         axios.get(`${BASE_URL}/habits/today`,{ headers: { Authorization: `Bearer ${userInfo.token}`}})
             .then(ans => isDone(ans.data))
             .catch(ans => alert(ans.response.data.message))
-    }, [refreshState])
+    }, [refreshState, progress])
 
     function isDone (ans) {
         doneTasks = 0
@@ -49,7 +50,7 @@ export default function TodayScreen () {
             <TodayDate>
                     {date} <br/>
                     <Progress progress={progress}>
-                         {todayTasks.length===0? 'Nenhum hábito concluído ainda' : `${parseInt(progress*100/(todayTasks.length))}% dos hábitos concluídos`}
+                         {progress===0? 'Nenhum hábito concluído ainda' : `${parseInt(progress*100/(todayTasks.length))}% dos hábitos concluídos`}
                     </Progress>
             </TodayDate>
             <TodayContainer>
@@ -72,6 +73,7 @@ export default function TodayScreen () {
 function Today ({id, name, current, highest, done, refresh, userInfo, setRefreshState}) {
 
     const [doneState, setDoneState] = useState(done)
+    refresh = 0
 
     function doneTask (doneState) {
 
@@ -88,7 +90,6 @@ function Today ({id, name, current, highest, done, refresh, userInfo, setRefresh
 
     function refreshPage (ans) {
         setDoneState(!ans)
-        refresh++
         setRefreshState(refresh++)
     }
     
