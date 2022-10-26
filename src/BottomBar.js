@@ -14,6 +14,7 @@ export default function BottomBar() {
     function refreshBar() {
         navigate('/hoje')
         setProgress(userProgress)
+        console.log(userProgress)
     }
 
     return (
@@ -21,14 +22,14 @@ export default function BottomBar() {
             <Link to='/habitos'>Hábitos</Link>
             <button onClick={() => refreshBar()}>
                 <CircularProgressbar
-                    value={progress === 0 ? '0' : parseInt(progress.done * 100 / (progress.tasks))}
+                    value={progress.done !== 0 && parseInt(progress.done * 100 / (progress.tasks))}
                     text={`Hoje`}
                     background
                     backgroundPadding={2}
                     styles={buildStyles({
                         backgroundColor: softblue,
                         textColor: "white",
-                        pathColor: "white",
+                        pathColor: 'white',
                         trailColor: softblue,
                         textSize: '25px'
                     })}
